@@ -38,8 +38,8 @@
     <string name="about">The Listening Post is a simple and easy-to-use experience for users, minimising barriers to submitting media and providing an intuitive experience.</string>
     <string name="capture_now">Capture now</string>
     <string name="import_gallery">Import from gallery</string>
-    <string name="chose_media_capture">Choose media to capture</string>
-    <string name="chose_media_import">Choose media to import</string>
+    <string name="choose_media_capture">Choose media to capture</string>
+    <string name="choose_media_import">Choose media to import</string>
     <!-- menus -->
     <string name="menu_new_project">New</string>
     <string name="menu_projects">Stories</string>

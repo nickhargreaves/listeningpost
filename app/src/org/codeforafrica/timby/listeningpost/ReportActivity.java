@@ -373,8 +373,12 @@ OnItemLongClickListener{
     public void captureDialog(){
     	dialog = new Dialog(ReportActivity.this);
         //dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-	    dialog.setTitle("Choose Media Type");
-    	dialog.setContentView(R.layout.dialog_media_types);
+	    if(importing==true){
+	    	dialog.setTitle(getResources().getString(R.string.choose_media_import));
+	    }else{
+	    	dialog.setTitle(getResources().getString(R.string.choose_media_capture));
+	    }
+	    dialog.setContentView(R.layout.dialog_media_types);
 	    
 	    images = (RelativeLayout)dialog.findViewById(R.id.add_picture);
         video = (RelativeLayout)dialog.findViewById(R.id.add_video);
