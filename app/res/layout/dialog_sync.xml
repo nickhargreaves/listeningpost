@@ -2,14 +2,15 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 android:layout_width="match_parent"
 android:layout_height="match_parent"
-android:orientation="vertical"
-android:background="@color/light_cream" >
+android:orientation="vertical" >
 
     <CheckBox
         android:id="@+id/checkBox1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
+        style="@style/CardTitle"
+              android:textSize="16sp"
         android:text="@string/export_option"/>
 
 <LinearLayout
@@ -27,7 +28,7 @@ android:background="@color/light_cream" >
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:text="@string/sync"
-        android:background="@color/soft_purple"
+        android:background="@color/lp_blue"
         android:textColor="@color/white" />
 
     <Button
@@ -36,7 +37,7 @@ android:background="@color/light_cream" >
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:text="@string/export"
-        android:background="@color/red"
+        android:background="@color/lp_red"
         android:textColor="@color/white" />
 </LinearLayout>
 

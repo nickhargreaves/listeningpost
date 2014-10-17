@@ -56,8 +56,6 @@ public class ProjectsActivity extends BaseActivity {
         initListView(mListView);
     }
     
-    
-    
     @Override
 	protected void onResume() {
 		super.onResume();
@@ -76,7 +74,7 @@ public class ProjectsActivity extends BaseActivity {
 		switch (item.getItemId()) {
          case android.R.id.home:
 
-	        	NavUtils.navigateUpFromSameTask(this);
+	        	finish();
 	        	
              return true;
          

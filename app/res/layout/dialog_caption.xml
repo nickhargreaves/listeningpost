@@ -16,7 +16,7 @@ android:padding="10dp" >
         android:layout_margin="3dp"
               style="@style/CardTitle"
               android:textSize="22sp"
-              android:textColor="@color/white">
+              android:textColor="@color/lp_blue">
         <requestFocus />
     </EditText>
 

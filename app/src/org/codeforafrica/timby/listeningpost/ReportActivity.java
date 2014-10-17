@@ -119,7 +119,18 @@ OnItemLongClickListener{
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
-        setContentView(R.layout.activity_report_edit);
+        Intent i = getIntent();
+        rid = i.getIntExtra("rid", -1);
+        
+        if(rid==-1){
+        	
+            setContentView(R.layout.activity_report_add);
+            
+        }else{
+        	
+            setContentView(R.layout.activity_report_edit);
+        	
+        }
         
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         //getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#ffffff")));
@@ -242,8 +253,7 @@ OnItemLongClickListener{
         setLocation = (ImageView)findViewById(R.id.imageView4);
         gpsInfo = (TextView)findViewById(R.id.textViewLocation);
         
-        Intent i = getIntent();
-        rid = i.getIntExtra("rid", -1);
+        
         
         
       //entity

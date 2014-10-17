@@ -236,13 +236,21 @@ public class AddClipsFragment extends Fragment {
             return POSITION_NONE;
         }
     }
-    public void addToQ(Media media) throws JSONException{
+public void addToQ(Media media) throws JSONException{
+    	
+    	
+    	
     	//create and store thumbnails in hidden folder on sd
     	
     	File thumbDir = new File(Environment.getExternalStorageDirectory() + "/" + AppConstants.TAG + "/.thumbs");
     	if(!thumbDir.exists()){
     		thumbDir.mkdirs();
     	}
+    	
+    	File thisThumb = new File(thumbDir.getAbsolutePath() + "/" + media.getId()+".jpg");
+    	
+    	//if thumbnail does not exist
+    	if(!thisThumb.exists()){
     	
         //Create thumbnail
         Bitmap bitThumb = null;
@@ -254,7 +262,7 @@ public class AddClipsFragment extends Fragment {
         	bitThumb = BitmapFactory.decodeFile(media.getPath());
         }
         	try{
-        		filename = thumbDir + "/" + media.getId()+".jpg";
+        		filename = thumbDir.getAbsolutePath() + "/" + media.getId()+".jpg";
         		FileOutputStream out = new FileOutputStream(filename);
         		bitThumb.compress(Bitmap.CompressFormat.JPEG, 30, out);
         		out.close();
@@ -276,30 +284,29 @@ public class AddClipsFragment extends Fragment {
         if(media!=null){
 	        String media_id = String.valueOf(media.getId());
 	        
-	        boolean isAdded = false; 
-	        
+	        Log.d("encrypted", "encrypted: " + media_id + ": " + media.getEncrypted());
 	        //Check if media is already encrypted
-	        if(media.getEncrypted()==0){
-	        	//Check if value is already added 
+	        if(media.getEncrypted()!=1){
+	        	//Check if value is already added for encryption: maybe just not complete
 	        	
 	        	//TODO: find faster way to do this
+	        	boolean isAdded = false; 
 	        	for (int i = 0; i < jsonArray2.length(); i++) {
 	                if(jsonArray2.getString(i).equals(media_id)){
 	                	isAdded = true;
 	                }
 	           }
+	        	Editor editor = prefs.edit();
+		        if(isAdded==false){
+			        //Then add new value
+			        jsonArray2.put(media_id);
+			        editor.putString("eQ", jsonArray2.toString());
+			        
+		        }
+		        System.out.println(jsonArray2.toString());
+		        editor.commit();
 	        }
-	        Editor editor = prefs.edit();
-	        if(isAdded==false){
-		        //Then add new value
-		        jsonArray2.put(media_id);
-		        editor.putString("eQ", jsonArray2.toString());
-		        
-	        }
-	        System.out.println(jsonArray2.toString());
-	        editor.commit();
+        }
         }
     }
-
-
 }
