@@ -249,7 +249,7 @@ public class StoryNewActivity extends BaseActivity {
         intent.putExtra("pid", project.getId());
         intent.putExtra("scene", 0);
         intent.putExtra("quickstory", quickstory);
-        intent.putExtra("auto_capture", true);
+        intent.putExtra("auto_capture", false);
         intent.putExtra("importing", importing);
         startActivity(intent);
         

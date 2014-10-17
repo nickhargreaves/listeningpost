@@ -212,7 +212,9 @@ public class AddClipsFragment extends Fragment {
                 media = lMedia.get(i);
                 //add to queue for encryption if not added
                 try {
-					addToQ(media);
+                		if(media!=null){
+                			addToQ(media);
+						}
 				} catch (JSONException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

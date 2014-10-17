@@ -29,6 +29,7 @@ import org.codeforafrica.timby.listeningpost.model.template.Clip;
 import org.codeforafrica.timby.listeningpost.model.template.Template;
 import org.ffmpeg.android.MediaUtils;
 import org.holoeverywhere.app.AlertDialog;
+import org.holoeverywhere.app.Dialog;
 import org.holoeverywhere.widget.Toast;
 import org.json.JSONArray;
 
@@ -47,6 +48,10 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
+import android.view.View;
+import android.view.Window;
+import android.view.View.OnClickListener;
+import android.widget.EditText;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.view.ActionMode;
@@ -66,9 +71,8 @@ import com.actionbarsherlock.view.MenuItem;
     public Fragment mFragmentTab0, mFragmentTab1, mLastTabFrag;
     public PublishFragment mPublishFragment;
     public int quickstory;
-    
-    public boolean importing;
     public String mimeType;
+    public boolean importing;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -130,25 +134,23 @@ import com.actionbarsherlock.view.MenuItem;
         // Set up the action bar.
         final ActionBar actionBar = getSupportActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setDisplayHomeAsUpEnabled(false);
         
         if (mMPM.mScene != null) {
             actionBar.setTitle(mMPM.mScene.getTitle());
         }
 
         // For each of the sections in the app, add a tab to the action bar.
-        if (mMPM.mProject.isTemplateStory()) {
+        /*if (mMPM.mProject.isTemplateStory()) {
             actionBar.addTab(actionBar.newTab().setText(R.string.tab_finish).setTabListener(this));
 	    } else {
 	         actionBar.addTab(actionBar.newTab().setText("Caption").setTabListener(this));
-	    }
+	    }*/
         //actionBar.addTab(actionBar.newTab().setText(R.string.tab_add_clips).setTabListener(this));
-        actionBar.addTab(actionBar.newTab().setText("Scene").setTabListener(this));     
-        
-        
+        actionBar.addTab(actionBar.newTab().setText("Scene editor").setTabListener(this));     
         
         if(importing == true){
-        		int req = 0;
+        	int req = 0;
         	if(mMPM.mProject.getStoryType() == Project.STORY_TYPE_PHOTO){
         		mimeType = "image/*";
         		req = MediaConstants.GALLERY_RESULT;
@@ -185,55 +187,67 @@ import com.actionbarsherlock.view.MenuItem;
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
 
-        getSupportMenuInflater().inflate(R.menu.activity_scene_editor, menu);
-        mMenu = menu;
+        getSupportMenuInflater().inflate(R.menu.activity_scene_done, menu);
         
-        return false;//hide SM menu for now
+
+        menu.findItem(R.id.about).setVisible(false);
+        menu.findItem(R.id.menu_new_form).setVisible(false);
+        return true;//hide SM menu for now
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.itemForward:
-                int idx = getSupportActionBar().getSelectedNavigationIndex();
-                if (idx < 2) {
-                    getSupportActionBar().setSelectedNavigationItem(Math.min(2, idx + 1));
-                } else {
-                    mPublishFragment.doPublish();
-                }
-                return true;
-            case R.id.addFromGallery:
-                addMediaFromGallery(0);
             
-                return true;
-            case R.id.addNewShot:
-             
-                addShotToScene();
-                
-                return true;
-            case R.id.delShot:
+            case R.id.menu_done:
             	
-            	deleteCurrentShot();
-            	return true;
-            case R.id.exportProjectFiles:
-                exportProjectFiles();
-            
-                return true;
-            case R.id.itemTrim:
-                if (mFragmentTab1 != null) {
-                	if(((OrderClipsFragment) mFragmentTab1).loadTrim()) {
-                        ((OrderClipsFragment) mFragmentTab1).enableTrimUIMode();
-                        startActionMode(mActionModeCallback);
-                	}
-                	
-                	return true;
-                }
+            	showCaptionDialog();
+                
                 return true;
                 
         }
         return super.onOptionsItemSelected(item);
     }
-    
+    public void showCaptionDialog(){
+    	final Dialog dialog = new Dialog(this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setTitle("Add caption");
+    	dialog.setContentView(R.layout.dialog_caption);
+    	dialog.findViewById(R.id.button_caption).setOnClickListener(new OnClickListener(){
+ 			@Override
+ 			public void onClick(View v) {
+ 				EditText etCaption = (EditText)(dialog.findViewById(R.id.caption));
+
+			       mMPM.mProject.setTitle(etCaption.getText().toString());
+			       mMPM.mProject.save();
+			     //Load report screen
+				    int reportid = mMPM.mProject.getReport();
+				    Intent i = new Intent(SceneEditorActivity.this, ReportActivity.class);
+				    i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				    i.putExtra("rid", reportid);
+				    startActivity(i);
+				    finish();
+ 					dialog.dismiss();
+ 			}
+         });
+         dialog.findViewById(R.id.button_discard).setOnClickListener(new OnClickListener(){
+ 			@Override
+ 			public void onClick(View v) {
+ 				   
+ 				dialog.dismiss();
+ 				//Load report screen
+ 			    int reportid = mMPM.mProject.getReport();
+ 			    Intent i = new Intent(SceneEditorActivity.this, ReportActivity.class);
+ 			    i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+ 			    i.putExtra("rid", reportid);
+ 			    startActivity(i);
+ 			    finish();
+ 			    
+ 			}
+ 		});
+       
+    	dialog.show();
+    }
     private boolean actionModelCancel = false;
     private ActionMode.Callback mActionModeCallback = new ActionMode.Callback() {
 
@@ -419,7 +433,7 @@ import com.actionbarsherlock.view.MenuItem;
      
     private void addMediaFromGallery(int req)
     {
-        mMPM.mMediaHelper.openGalleryChooser(mimeType, req);
+    	mMPM.mMediaHelper.openGalleryChooser(mimeType, req);
     }
 
     @Override
@@ -462,7 +476,7 @@ import com.actionbarsherlock.view.MenuItem;
         }
         
         //Make Tab
-        if (tab.getPosition() == 1) {
+        if (tab.getPosition() == 0) {
             if (mMenu != null) {
                 mMenu.findItem(R.id.itemForward).setEnabled(true);
                 
@@ -537,7 +551,7 @@ import com.actionbarsherlock.view.MenuItem;
 
             mLastTabFrag = mFragmentTab1;
           //Publish Tab
-        } */else if (tab.getPosition() == 0) {
+        } else if (tab.getPosition() == 1) {
         	
         	if (mMenu != null) {
 	        	//hide irrelevant menu items
@@ -579,7 +593,7 @@ import com.actionbarsherlock.view.MenuItem;
     
                 mLastTabFrag = mPublishFragment;
             }
-        }
+        }*/
     }
 
     @Override
@@ -627,14 +641,14 @@ import com.actionbarsherlock.view.MenuItem;
             Intent i = new Intent(getApplicationContext(), OverlayCameraActivity.class);
             i.putExtra("group", shotType);
             i.putExtra("mode", mProject.getStoryType());
-            
+            /*
             if(mProject.getMediaAsList().size()<2){
             	if(taken<1){
             		i.putExtra("take1", "1");
             		taken++;
             	}
             }
-            
+            */
             mMPM.mClipIndex = clipIndex;
             startActivityForResult(i, REQ_OVERLAY_CAM);
         }
@@ -644,7 +658,6 @@ import com.actionbarsherlock.view.MenuItem;
 
     @Override
     protected void onActivityResult(int reqCode, int resCode, Intent intent) {
-
     	
         if (resCode == RESULT_OK)
         {
@@ -694,6 +707,4 @@ import com.actionbarsherlock.view.MenuItem;
         }
     }
 
-    
-    
 }
