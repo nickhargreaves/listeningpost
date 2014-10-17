@@ -721,6 +721,7 @@ public int getMediaCount(){
         //menu.getItem(0).setTitle("test").setShowAsAction(com.actionbarsherlock.view.MenuItem.SHOW_AS_ACTION_WITH_TEXT);
         MenuItem galleryItem = menu.findItem(R.id.gallery);
         galleryItem.setTitle("Gallery (" + getMediaCount() + ")");
+        
         return true;
     }
     @Override
