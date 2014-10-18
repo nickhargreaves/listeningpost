@@ -262,7 +262,6 @@ OnItemLongClickListener{
 
         capture_now = (RelativeLayout)findViewById(R.id.capturenow);
         capture_now.setOnClickListener(new View.OnClickListener() {
-			
 			@Override
 			public void onClick(View v) {
 				importing = false;
@@ -313,8 +312,6 @@ OnItemLongClickListener{
         video.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				//TODO Auto-generated method stub
-				
 				story_mode = 2;
 				resultMode = Project.STORY_TYPE_VIDEO;
 				if(addscreen==true){
@@ -327,8 +324,6 @@ OnItemLongClickListener{
         audio.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				//TODO Auto-generated method stub
-				
 				story_mode = 2;
 				resultMode = Project.STORY_TYPE_AUDIO;
 				if(addscreen==true){

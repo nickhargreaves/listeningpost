@@ -3,7 +3,10 @@ package org.codeforafrica.timby.listeningpost;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 import org.codeforafrica.timby.listeningpost.R;
 import org.codeforafrica.timby.listeningpost.model.Media;
@@ -236,10 +239,9 @@ public class AddClipsFragment extends Fragment {
             return POSITION_NONE;
         }
     }
-public void addToQ(Media media) throws JSONException{
-    	
-    	
-    	
+    
+    public void addToQ(Media media) throws JSONException{
+	
     	//create and store thumbnails in hidden folder on sd
     	
     	File thumbDir = new File(Environment.getExternalStorageDirectory() + "/" + AppConstants.TAG + "/.thumbs");
@@ -247,7 +249,10 @@ public void addToQ(Media media) throws JSONException{
     		thumbDir.mkdirs();
     	}
     	
-    	File thisThumb = new File(thumbDir.getAbsolutePath() + "/" + media.getId()+".jpg");
+    	SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+    	String mt = dateFormat.format(media.getCreatedAt());
+    	
+    	File thisThumb = new File(thumbDir.getAbsolutePath() + "/" + mt+".jpg");
     	
     	//if thumbnail does not exist
     	if(!thisThumb.exists()){
@@ -262,7 +267,7 @@ public void addToQ(Media media) throws JSONException{
         	bitThumb = BitmapFactory.decodeFile(media.getPath());
         }
         	try{
-        		filename = thumbDir.getAbsolutePath() + "/" + media.getId()+".jpg";
+        		filename = thumbDir.getAbsolutePath() + "/" + mt+".jpg";
         		FileOutputStream out = new FileOutputStream(filename);
         		bitThumb.compress(Bitmap.CompressFormat.JPEG, 30, out);
         		out.close();
@@ -307,6 +312,6 @@ public void addToQ(Media media) throws JSONException{
 		        editor.commit();
 	        }
         }
-        }
+       }
     }
 }
