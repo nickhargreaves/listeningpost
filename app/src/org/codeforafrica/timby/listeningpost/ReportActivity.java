@@ -121,20 +121,142 @@ OnItemLongClickListener{
         
         Intent i = getIntent();
         rid = i.getIntExtra("rid", -1);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         
         if(rid==-1){
         	
-            setContentView(R.layout.activity_report_add);
-            
+            setContentView(R.layout.activity_report_add);            
+            new_report = true;
+        	getSupportActionBar().setTitle("Add Media");
+        	
         }else{
         	
             setContentView(R.layout.activity_report_edit);
-        	
-        }
         
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        //getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#ffffff")));
-      
+	        editTextStoryName = (EditText)findViewById(R.id.editTextStoryName);
+	        
+	        
+	        addEntity = (Button)findViewById(R.id.AddEntity);
+	        entitiesLV = (ListView)findViewById(R.id.EntitiesList);
+	        
+	        spinnerSector = (Spinner)findViewById(R.id.spinnerSector);
+	        setSectors();        
+	        
+	        spinnerIssue = (Spinner)findViewById(R.id.spinnerIssue);
+	        setCategories();
+	        
+	        editTextDesc = (EditText)findViewById(R.id.editTextDescription);
+	        
+	        done = (Button)findViewById(R.id.done);
+	        
+	        setLocation = (ImageView)findViewById(R.id.imageView4);
+	        gpsInfo = (TextView)findViewById(R.id.textViewLocation);
+	        
+	        //entity
+	        datasource = new ArrayList<String>();
+	        adapter = new MyAdapter();
+	        
+	        entitiesLV.setAdapter(adapter);
+	        entitiesLV.setOnItemLongClickListener(this);
+	        
+	        setEntities();
+	        addEntity.setOnClickListener(new OnClickListener() {
+	
+	            @Override
+	            public void onClick(View v) {
+	            	 dialog = new Dialog(ReportActivity.this);
+	            	 dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+	                 dialog.setContentView(R.layout.dialog_entities);
+	                 //Entities autocomplete 
+	                 ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(),
+	                         android.R.layout.simple_dropdown_item_1line, allEntities);
+	                 AutoCompleteTextView textView = (AutoCompleteTextView)dialog.findViewById(R.id.edit_box);
+	                 textView.setAdapter(adapter);
+	                dialog.findViewById(R.id.button_cancel).setOnClickListener(
+	                        ReportActivity.this);
+	                dialog.findViewById(R.id.button_ok).setOnClickListener(
+	                        ReportActivity.this);
+	                dialog.setTitle("Add Entity");
+	                dialog.show();
+	            }
+	        });        
+	        
+	        done.setText("Submit");
+	       
+	        	getSupportActionBar().setTitle("Edit");
+	        	Report r = Report.get(this, rid);
+	        	
+	        	location = r.getLocation();
+	        	title = r.getTitle();
+	            sector = r.getSector();
+	            issue = r.getIssue();
+	            entity = r.getEntity();
+	            description = r.getDescription();
+	            
+	            if(!r.getServerId().equals("0")){
+	            	done.setText("Update");
+	            }
+	            
+	            if(location.equals("0, 0")){
+	        		location = "Location not set";
+	        	}
+	            editTextStoryName.setText(title);
+	            spinnerSector.setSelection(Integer.parseInt(sector));
+	           
+	            spinnerIssue.setSelection(Integer.parseInt(issue));
+	            editTextDesc.setText(description);
+	            
+	            
+	            String[] mListEntities = entity.split(",");
+	            
+	    	 	for (int j = 0; j < mListEntities.length; j++) {
+	    	 		datasource.add(mListEntities[j]);
+	    	 	}
+	    	 	
+	    	 	entitiesLV.setAdapter(adapter);
+	            
+	            gpsInfo.setText(location);
+	        
+	        
+	        if (datasource.size()==0){
+	        	entitiesLV.setVisibility(View.GONE);
+	        }
+	     
+	        
+	        done.setOnClickListener(new OnClickListener() {
+	            
+	            @Override
+	            public void onClick(View v) {
+	            	
+	            	report_save();
+	            	
+	            }
+	        });
+	        
+			setLocation.setOnClickListener(new OnClickListener(){
+				@Override
+	            public void onClick(View v) {		
+					setLocation();
+				}
+			});
+			
+			toggleGPS = (ToggleButton) findViewById(R.id.toggleButton1);
+	        toggleGPS.setOnClickListener(new OnClickListener() {
+	
+	            @Override
+	            public void onClick(View arg0) {
+	            	                	
+	                if(toggleGPS.isChecked()){
+	                	setLocation();
+	                }
+	                else{
+	                	gpsInfo.setText("0, 0");
+	                }
+	            }
+	        });
+        }
+
         capture_now = (RelativeLayout)findViewById(R.id.capturenow);
         capture_now.setOnClickListener(new View.OnClickListener() {
 			
@@ -155,228 +277,6 @@ OnItemLongClickListener{
 				
 			}
 		});
-        
-        //TextView title2 = (TextView) getWindow().getDecorView().findViewById(getResources().getIdentifier("action_bar_title", "id", "android"));
-        //title2.setTextColor(getResources().getColor(R.color.soft_purple));
-        
-        //
-        /*
-        images = (RelativeLayout)findViewById(R.id.images);
-        video = (RelativeLayout)findViewById(R.id.video);
-        audio = (RelativeLayout)findViewById(R.id.audio);
-        gallery = (RelativeLayout)findViewById(R.id.gallery);
-        btnImport = (Button)findViewById(R.id.buttonImport);
-        
-        btnImport.setOnClickListener(new View.OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				// TODO Auto-generated method stub
-				launchProject(editTextStoryName.getText().toString(), spinnerIssue.getSelectedItemPosition(),spinnerSector.getSelectedItemPosition(),datasource.toString(),editTextDesc.getText().toString(),gpsInfo.getText().toString(), false, true);		
-
-			}
-		});
-        
-        images.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				//TODO Auto-generated method stub
-				
-				story_mode = 2;
-				resultMode = Project.STORY_TYPE_PHOTO;
-				launchProject(editTextStoryName.getText().toString(), spinnerIssue.getSelectedItemPosition(),spinnerSector.getSelectedItemPosition(),datasource.toString(),editTextDesc.getText().toString(),gpsInfo.getText().toString(), false, false);		
-				
-			}
-		});
-        video.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				//TODO Auto-generated method stub
-				
-				story_mode = 2;
-				resultMode = Project.STORY_TYPE_VIDEO;
-				launchProject(editTextStoryName.getText().toString(), spinnerIssue.getSelectedItemPosition(),spinnerSector.getSelectedItemPosition(),datasource.toString(),editTextDesc.getText().toString(),gpsInfo.getText().toString(), false, false);		
-				
-			}
-		});
-        audio.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				//TODO Auto-generated method stub
-				
-				story_mode = 2;
-				resultMode = Project.STORY_TYPE_AUDIO;
-				launchProject(editTextStoryName.getText().toString(), spinnerIssue.getSelectedItemPosition(),spinnerSector.getSelectedItemPosition(),datasource.toString(),editTextDesc.getText().toString(),gpsInfo.getText().toString(), false, false);		
-				
-			}
-		});
-        
-        gallery.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				//TODO Auto-generated method stub
-				
-				ArrayList<Project> mListProjects;
-	    		mListProjects = Project.getAllAsList(getApplicationContext(), rid);
-	    	 	
-	    		if(mListProjects.size()>0){
-					Intent p = new Intent(getBaseContext(), ProjectsActivity.class);
-	            	p.putExtra("rid", rid);
-	            	p.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-	            	startActivity(p);
-	    		}else{
-	    			Toast.makeText(getApplicationContext(), "No media added on this report yet!", Toast.LENGTH_LONG).show();
-	    		}
-			}
-		});
-        */
-        
-        //txtNewStoryDesc = (TextView)findViewById(R.id.txtNewStoryDesc);
-        editTextStoryName = (EditText)findViewById(R.id.editTextStoryName);
-        
-        
-        addEntity = (Button)findViewById(R.id.AddEntity);
-        entitiesLV = (ListView)findViewById(R.id.EntitiesList);
-        
-        spinnerSector = (Spinner)findViewById(R.id.spinnerSector);
-        setSectors();        
-        
-        spinnerIssue = (Spinner)findViewById(R.id.spinnerIssue);
-        setCategories();
-        
-        editTextDesc = (EditText)findViewById(R.id.editTextDescription);
-        
-        //rGroup = (RadioGroup)findViewById(R.id.radioGroupStoryType);
-        
-        done = (Button)findViewById(R.id.done);
-        //view = (ImageView)findViewById(R.id.view);
-        setLocation = (ImageView)findViewById(R.id.imageView4);
-        gpsInfo = (TextView)findViewById(R.id.textViewLocation);
-        
-        
-        
-        
-      //entity
-        datasource = new ArrayList<String>();
-        adapter = new MyAdapter();
-        
-        entitiesLV.setAdapter(adapter);
-        entitiesLV.setOnItemLongClickListener(this);
-        
-        setEntities();
-        addEntity.setOnClickListener(new OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-            	 dialog = new Dialog(ReportActivity.this);
-            	 dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                 dialog.setContentView(R.layout.dialog_entities);
-                 //Entities autocomplete 
-                 ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(),
-                         android.R.layout.simple_dropdown_item_1line, allEntities);
-                 AutoCompleteTextView textView = (AutoCompleteTextView)dialog.findViewById(R.id.edit_box);
-                 textView.setAdapter(adapter);
-                dialog.findViewById(R.id.button_cancel).setOnClickListener(
-                        ReportActivity.this);
-                dialog.findViewById(R.id.button_ok).setOnClickListener(
-                        ReportActivity.this);
-                dialog.setTitle("Add Entity");
-                dialog.show();
-            }
-        });        
-        /*
-        picture_label = (TextView)findViewById(R.id.picture_label);
-        video_label = (TextView)findViewById(R.id.video_label);
-        audio_label = (TextView)findViewById(R.id.audio_label);
-        gallery_label = (TextView)findViewById(R.id.gallery_label);
-        */
-        done.setText("Submit");
-        if(rid!=-1){ 
-        	getSupportActionBar().setTitle("Edit");
-        	Report r = Report.get(this, rid);
-        	
-        	location = r.getLocation();
-        	title = r.getTitle();
-            sector = r.getSector();
-            issue = r.getIssue();
-            entity = r.getEntity();
-            description = r.getDescription();
-            
-            if(!r.getServerId().equals("0")){
-            	done.setText("Update");
-            }
-            
-            if(location.equals("0, 0")){
-        		location = "Location not set";
-        	}
-            editTextStoryName.setText(title);
-            spinnerSector.setSelection(Integer.parseInt(sector));
-           
-            spinnerIssue.setSelection(Integer.parseInt(issue));
-            editTextDesc.setText(description);
-            
-            
-            String[] mListEntities = entity.split(",");
-            
-    	 	for (int j = 0; j < mListEntities.length; j++) {
-    	 		datasource.add(mListEntities[j]);
-    	 	}
-    	 	
-    	 	entitiesLV.setAdapter(adapter);
-            
-            gpsInfo.setText(location);
-            
-            //setMediaCount();
-            
-        }else{
-        	setLocation();
-        	new_report = true;
-        	getSupportActionBar().setTitle("Add Media");
-        	/*
-            picture_label.setText("Picture (0)");
-        	video_label.setText("Video (0)");
-        	audio_label.setText("Audio (0)");
-        	gallery_label.setText("Gallery (0)");
-        	*/
-        }
-        
-        if (datasource.size()==0){
-        	entitiesLV.setVisibility(View.GONE);
-        }
-     
-        
-        done.setOnClickListener(new OnClickListener() {
-            
-            @Override
-            public void onClick(View v) {
-            	
-            	report_save();
-            	
-            }
-        });
-        
-		setLocation.setOnClickListener(new OnClickListener(){
-			@Override
-            public void onClick(View v) {		
-				setLocation();
-			}
-		});
-		
-		toggleGPS = (ToggleButton) findViewById(R.id.toggleButton1);
-        toggleGPS.setOnClickListener(new OnClickListener() {
-
-            @Override
-            public void onClick(View arg0) {
-            	                	
-                if(toggleGPS.isChecked()){
-                	setLocation();
-                }
-                else{
-                	gpsInfo.setText("0, 0");
-                }
-            }
-        });
-        
     }
 
 
