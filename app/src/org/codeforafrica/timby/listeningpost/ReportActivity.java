@@ -114,6 +114,7 @@ OnItemLongClickListener{
     public RelativeLayout capture_now;
     public RelativeLayout importfromgallery;
     private boolean importing = false;
+    private boolean addscreen = false;
     @Override
     @SuppressLint("NewApi")
     public void onCreate(Bundle savedInstanceState) {
@@ -129,9 +130,11 @@ OnItemLongClickListener{
             setContentView(R.layout.activity_report_add);            
             new_report = true;
         	getSupportActionBar().setTitle("Add Media");
+        	addscreen = true;
         	
         }else{
         	
+        	addscreen = false;
             setContentView(R.layout.activity_report_edit);
         
 	        editTextStoryName = (EditText)findViewById(R.id.editTextStoryName);
@@ -282,7 +285,6 @@ OnItemLongClickListener{
 
     public void captureDialog(){
     	dialog = new Dialog(ReportActivity.this);
-        //dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 	    if(importing==true){
 	    	dialog.setTitle(getResources().getString(R.string.choose_media_import));
 	    }else{
@@ -300,7 +302,11 @@ OnItemLongClickListener{
 			public void onClick(View v) {
 				story_mode = 2;
 				resultMode = Project.STORY_TYPE_PHOTO;
-				launchProject(editTextStoryName.getText().toString(), spinnerIssue.getSelectedItemPosition(),spinnerSector.getSelectedItemPosition(),datasource.toString(),editTextDesc.getText().toString(),gpsInfo.getText().toString(), false, importing);		
+				if(addscreen==true){
+					launchProject(null, 0,0,null,null,null, false, importing);		
+				}else{
+					launchProject(editTextStoryName.getText().toString(), spinnerIssue.getSelectedItemPosition(),spinnerSector.getSelectedItemPosition(),datasource.toString(),editTextDesc.getText().toString(),gpsInfo.getText().toString(), false, importing);		
+				}
 				
 			}
 		});
@@ -311,8 +317,11 @@ OnItemLongClickListener{
 				
 				story_mode = 2;
 				resultMode = Project.STORY_TYPE_VIDEO;
-				launchProject(editTextStoryName.getText().toString(), spinnerIssue.getSelectedItemPosition(),spinnerSector.getSelectedItemPosition(),datasource.toString(),editTextDesc.getText().toString(),gpsInfo.getText().toString(), false, importing);							
-				
+				if(addscreen==true){
+					launchProject(null, 0,0,null,null,null, false, importing);		
+				}else{
+					launchProject(editTextStoryName.getText().toString(), spinnerIssue.getSelectedItemPosition(),spinnerSector.getSelectedItemPosition(),datasource.toString(),editTextDesc.getText().toString(),gpsInfo.getText().toString(), false, importing);							
+				}
 			}
 		});
         audio.setOnClickListener(new View.OnClickListener() {
@@ -322,14 +331,17 @@ OnItemLongClickListener{
 				
 				story_mode = 2;
 				resultMode = Project.STORY_TYPE_AUDIO;
-				launchProject(editTextStoryName.getText().toString(), spinnerIssue.getSelectedItemPosition(),spinnerSector.getSelectedItemPosition(),datasource.toString(),editTextDesc.getText().toString(),gpsInfo.getText().toString(), false, importing);							
-				
+				if(addscreen==true){
+					launchProject(null, 0,0,null,null,null, false, importing);		
+				}else{
+					launchProject(editTextStoryName.getText().toString(), spinnerIssue.getSelectedItemPosition(),spinnerSector.getSelectedItemPosition(),datasource.toString(),editTextDesc.getText().toString(),gpsInfo.getText().toString(), false, importing);							
+				}
 			}
 		});
         
 	    dialog.show();
     }
-public int getMediaCount(){
+    public int getMediaCount(){
     	
     	pics = 0;
     	vids = 0;
@@ -521,65 +533,18 @@ public int getMediaCount(){
     
     private boolean formValid ()
     {
-    	/*String pName = editTextStoryName.getText().toString();
-    	
-    	
-    	if (pName == null || pName.length() == 0)
-    	{
-    		Toast.makeText(this, R.string.you_must_enter_a_project_name, Toast.LENGTH_SHORT).show();
-    		return false;
-    	}else if(spinnerSector.getSelectedItemPosition()==0){
-    		Toast.makeText(this, "You must select a sector", Toast.LENGTH_SHORT).show();
-    		return false;
-    	}
-    	else if(gpsInfo.getText().toString().equals("Location not set")){
-    		Toast.makeText(this, "You must set location", Toast.LENGTH_SHORT).show();
-    		return false;
-    	}
-    	else
-    	{
-    		return true;
-    	}*/
     	return true;
     }
-    /*
-    private int getSelectedStoryMode ()
-    {
-    	   int checkedId = rGroup.getCheckedRadioButtonId();
-    	   int resultMode = -1;
-    	   
-    	   switch (checkedId)
-    	   {
-    	   case R.id.radioStoryType0:
-    		   resultMode = Project.STORY_TYPE_VIDEO;
-    		   ((RadioButton)findViewById(R.id.radioStoryType0)).setChecked(false);
-    		   break;
-    	   case R.id.radioStoryType1:
-    		   resultMode = Project.STORY_TYPE_PHOTO;
-    		   ((RadioButton)findViewById(R.id.radioStoryType1)).setChecked(false);
-    		   break;
-    		   
-    	   case R.id.radioStoryType2:
-    		   resultMode = Project.STORY_TYPE_AUDIO;
-    		   ((RadioButton)findViewById(R.id.radioStoryType2)).setChecked(false);
-    		   break;
-    		  	   
-    	   case R.id.radioStoryType3:
-    		   resultMode = Project.STORY_TYPE_ESSAY;
-    		   ((RadioButton)findViewById(R.id.radioStoryType3)).setChecked(false);
-    		   break;
-    		   
-    	   }
-    	   
-    	   return resultMode;
-    }
-    */		
 
     private void launchProject(String title, int pIssue, int pSector, String pEntity, String pDesc, String pLocation, boolean update, boolean importing) {
     	
     	new_report = false;
     	SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     	String currentdate = dateFormat.format(new Date());
+    	
+    	if(pLocation==null){
+    		pLocation = "0, 0";
+    	}
     	
     	if(pLocation.equals("Location not set")){
     		pLocation = "0, 0";
@@ -590,6 +555,13 @@ public int getMediaCount(){
     		title = "Captured at "+currentdate;
     	}
     	
+    	if(pEntity==null){
+    		pEntity = "";
+    	}
+    	
+    	if(pDesc==null){
+    		pDesc = "";
+    	}
     	    	
     	pEntity = pEntity.replace("[", "");
     	pEntity = pEntity.replace("]", "");
